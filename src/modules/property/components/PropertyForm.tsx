@@ -85,59 +85,99 @@ export default function PropertyForm() {
         )
     }
 
-    // ✅ This return was missing
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="w-full max-w-2xl">
-                <h2 className="text-3xl font-bold mb-6 text-center">Add Property</h2>
+        <div className="min-h-screen bg-blue-50 flex items-center justify-center px-4 py-12">
+            <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
 
-                <ProgressBar step={step} totalSteps={stepLabels.length} labels={stepLabels} />
+                {/* Left: Sidebar */}
+                <div className="w-full md:w-1/3 bg-blue-700 text-white p-6 relative">
+                    <h3 className="uppercase text-sm font-bold mb-8 tracking-widest">Step {step} of 4</h3>
+                    <ul className="space-y-6 text-sm font-medium">
+                        <li className={`${step === 1 ? 'text-white font-bold' : 'text-blue-200'}`}>
+                            <span className="inline-block w-5 h-5 mr-2 rounded-full border-2 border-white text-xs text-center">
+                                1
+                            </span>
+                            Basic Info
+                        </li>
+                        <li className={`${step === 2 ? 'text-white font-bold' : 'text-blue-200'}`}>
+                            <span className="inline-block w-5 h-5 mr-2 rounded-full border-2 border-white text-xs text-center">
+                                2
+                            </span>
+                            Purchase
+                        </li>
+                        <li className={`${step === 3 ? 'text-white font-bold' : 'text-blue-200'}`}>
+                            <span className="inline-block w-5 h-5 mr-2 rounded-full border-2 border-white text-xs text-center">
+                                3
+                            </span>
+                            Rental Info
+                        </li>
+                        <li className={`${step === 4 ? 'text-white font-bold' : 'text-blue-200'}`}>
+                            <span className="inline-block w-5 h-5 mr-2 rounded-full border-2 border-white text-xs text-center">
+                                4
+                            </span>
+                            Expenses
+                        </li>
+                    </ul>
 
-                {step === 1 && (
-                    <Step1BasicInfo
-                        data={formData}
-                        updateFields={updateFields}
-                        onSuccess={() => setStep(2)}
-                    />
-                )}
+                    <div className="absolute bottom-6 left-6 right-6 h-2 bg-blue-300 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-white transition-all duration-300"
+                            style={{ width: `${(step / 4) * 100}%` }}
+                        />
+                    </div>
+                </div>
 
-                {step === 2 && (
-                    <Step2PurchaseDetails
-                        data={formData}
-                        updateFields={updateFields}
-                        onNext={() => setStep(3)}
-                        onBack={() => setStep(1)}
-                    />
-                )}
+                {/* Right: Form Step Content */}
+                <div className="w-full md:w-2/3 p-8 md:p-10">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Property</h2>
 
-                {step === 3 && (
-                    <Step3RentalInfo
-                        data={formData}
-                        updateFields={updateFields}
-                        onBack={() => setStep(2)}
-                        onNext={() => setStep(4)}
-                    />
-                )}
+                    {step === 1 && (
+                        <Step1BasicInfo
+                            data={formData}
+                            updateFields={updateFields}
+                            onSuccess={() => setStep(2)}
+                        />
+                    )}
 
-                {step === 4 && (
-                    <Step4Expenses
-                        data={formData}
-                        updateFields={updateFields}
-                        onBack={() => setStep(3)}
-                        onSubmit={async () => {
-                            try {
-                                const res = await createProperty(formData)
-                                console.log("Submitted to backend:", res)
-                                setIsSubmitted(true)
-                            } catch (err) {
-                                alert("Submission failed. Try again.")
-                                console.error(err)
-                            }
-                        }}
-                    />
-                )}
+                    {step === 2 && (
+                        <Step2PurchaseDetails
+                            data={formData}
+                            updateFields={updateFields}
+                            onNext={() => setStep(3)}
+                            onBack={() => setStep(1)}
+                        />
+                    )}
+
+                    {step === 3 && (
+                        <Step3RentalInfo
+                            data={formData}
+                            updateFields={updateFields}
+                            onBack={() => setStep(2)}
+                            onNext={() => setStep(4)}
+                        />
+                    )}
+
+                    {step === 4 && (
+                        <Step4Expenses
+                            data={formData}
+                            updateFields={updateFields}
+                            onBack={() => setStep(3)}
+                            onSubmit={async () => {
+                                try {
+                                    const res = await createProperty(formData)
+                                    console.log("Submitted to backend:", res)
+                                    setIsSubmitted(true)
+                                } catch (err) {
+                                    alert("Submission failed. Try again.")
+                                    console.error(err)
+                                }
+                            }}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     )
+
 }
 
