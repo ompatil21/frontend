@@ -5,7 +5,6 @@ import Step1BasicInfo from './Step1BasicInfo'
 import Step2PurchaseDetails from './Step2PurchaseDetails'
 import Step3RentalInfo from './Step3RentalInfo'
 import Step4Expenses from './Step4Expenses'
-import ProgressBar from './ProgressBar'
 import ConfirmationScreen from './ConfirmationScreen'
 import { createProperty } from '@/services/api'
 
@@ -29,7 +28,6 @@ type PropertyFormData = {
 }
 export default function PropertyForm() {
     const [step, setStep] = useState(1)
-    const stepLabels = ['Basic Info', 'Purchase', 'Rental Info', 'Expenses']
     const [isSubmitted, setIsSubmitted] = useState(false)
 
     const [formData, setFormData] = useState<PropertyFormData>({
