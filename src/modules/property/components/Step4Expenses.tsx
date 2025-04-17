@@ -5,15 +5,18 @@ import { ReceiptText, ShieldCheck, Wrench, UserCog } from 'lucide-react'
 
 type Props = {
     data: {
-        council_rates: number
-        insurance: number
-        maintenance: number
-        property_manager: number
+        council_rates: number | undefined
+        insurance: number | undefined
+        maintenance: number | undefined
+        property_manager: number | undefined
     }
     updateFields: (fields: Partial<Props['data']>) => void
     onSubmit: () => void
     onBack: () => void
 }
+
+
+
 
 export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: Props) {
     const {
