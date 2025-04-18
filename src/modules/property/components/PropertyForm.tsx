@@ -154,9 +154,10 @@ export default function PropertyForm() {
                         <Step4Expenses
                             data={formData}
                             updateFields={updateFields}
-                            onSubmit={() => setStep(5)}
                             onBack={() => setStep(3)}
+                            onNext={() => setStep(5)}
                         />
+
                     )}
 
                     {step === 5 && (
@@ -164,14 +165,15 @@ export default function PropertyForm() {
                             data={formData}
                             updateFields={updateFields}
                             onBack={() => setStep(4)}
-                            onSubmit={async () => {
+                            onSubmit={async (finalData) => {
                                 try {
-                                    const res = await createProperty(formData)
-                                    console.log('Submitted to backend:', res)
+                                    console.log("🚀 SENDING TO BACKEND:", finalData)
+                                    const res = await createProperty(finalData)  // ✅ use finalData, not formData
+                                    console.log("✅ Submitted to backend:", res)
                                     setIsSubmitted(true)
                                 } catch (err) {
-                                    alert('Submission failed. Try again.')
-                                    console.error(err)
+                                    console.error("❌ Submission failed:", err)
+                                    alert("Submission failed: Please check all required fields.")
                                 }
                             }}
                         />

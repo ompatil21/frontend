@@ -11,14 +11,11 @@ type Props = {
         property_manager: number | undefined
     }
     updateFields: (fields: Partial<Props['data']>) => void
-    onSubmit: () => void
+    onNext: () => void  // ✅ changed from onSubmit
     onBack: () => void
 }
 
-
-
-
-export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: Props) {
+export default function Step4Expenses({ data, updateFields, onNext, onBack }: Props) {
     const {
         register,
         handleSubmit,
@@ -29,14 +26,14 @@ export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: 
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleFinalSubmit = (values: any) => {
+    const handleNext = (values: any) => {
         updateFields(values)
-        onSubmit()
+        onNext()  // ✅ move to next step (Step 5)
     }
 
     return (
         <form
-            onSubmit={handleSubmit(handleFinalSubmit)}
+            onSubmit={handleSubmit(handleNext)}
             className="space-y-6 transition-all duration-300"
         >
             {/* Council Rates */}
@@ -47,11 +44,15 @@ export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: 
                 <input
                     type="number"
                     {...register('council_rates', { required: true, min: 0 })}
-                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.council_rates ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.council_rates
+                            ? 'border-red-500 focus:ring-red-400'
+                            : 'border-gray-300 focus:ring-blue-500'
                         }`}
                     placeholder="e.g. 1800"
                 />
-                {errors.council_rates && <p className="text-red-500 text-sm mt-1">Required</p>}
+                {errors.council_rates && (
+                    <p className="text-red-500 text-sm mt-1">Required</p>
+                )}
             </div>
 
             {/* Insurance */}
@@ -62,11 +63,15 @@ export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: 
                 <input
                     type="number"
                     {...register('insurance', { required: true, min: 0 })}
-                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.insurance ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.insurance
+                            ? 'border-red-500 focus:ring-red-400'
+                            : 'border-gray-300 focus:ring-blue-500'
                         }`}
                     placeholder="e.g. 1200"
                 />
-                {errors.insurance && <p className="text-red-500 text-sm mt-1">Required</p>}
+                {errors.insurance && (
+                    <p className="text-red-500 text-sm mt-1">Required</p>
+                )}
             </div>
 
             {/* Maintenance */}
@@ -77,11 +82,15 @@ export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: 
                 <input
                     type="number"
                     {...register('maintenance', { required: true, min: 0 })}
-                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.maintenance ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.maintenance
+                            ? 'border-red-500 focus:ring-red-400'
+                            : 'border-gray-300 focus:ring-blue-500'
                         }`}
                     placeholder="e.g. 800"
                 />
-                {errors.maintenance && <p className="text-red-500 text-sm mt-1">Required</p>}
+                {errors.maintenance && (
+                    <p className="text-red-500 text-sm mt-1">Required</p>
+                )}
             </div>
 
             {/* Property Manager Fees */}
@@ -92,11 +101,15 @@ export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: 
                 <input
                     type="number"
                     {...register('property_manager', { required: true, min: 0 })}
-                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.property_manager ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-500'
+                    className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 ${errors.property_manager
+                            ? 'border-red-500 focus:ring-red-400'
+                            : 'border-gray-300 focus:ring-blue-500'
                         }`}
                     placeholder="e.g. 1500"
                 />
-                {errors.property_manager && <p className="text-red-500 text-sm mt-1">Required</p>}
+                {errors.property_manager && (
+                    <p className="text-red-500 text-sm mt-1">Required</p>
+                )}
             </div>
 
             {/* Buttons */}
@@ -112,10 +125,12 @@ export default function Step4Expenses({ data, updateFields, onSubmit, onBack }: 
                 <button
                     type="submit"
                     disabled={!isValid}
-                    className={`px-6 py-2 rounded-md text-white font-semibold transition ${isValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+                    className={`px-6 py-2 rounded-md text-white font-semibold transition ${isValid
+                            ? 'bg-blue-600 hover:bg-blue-700'
+                            : 'bg-gray-400 cursor-not-allowed'
                         }`}
                 >
-                    Submit →
+                    Next →
                 </button>
             </div>
         </form>

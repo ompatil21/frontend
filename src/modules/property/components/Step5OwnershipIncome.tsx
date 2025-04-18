@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
+import { useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
-import { User, Percent, DollarSign, PlusCircle, Trash2 } from 'lucide-react'
+import { User, Percent, DollarSign, PlusCircle, Trash2, Info } from 'lucide-react'
 
 type Owner = {
     name: string
@@ -17,18 +18,19 @@ type Props = {
     }
     updateFields: (fields: Partial<Props['data']>) => void
     onBack: () => void
-    onSubmit: () => void
+    onSubmit: (finalData: any) => void
 }
 
-export default function Step5OwnershipIncome({ data, updateFields, onBack, onSubmit }: Props) {
+export default function Step5OwnershipIncome({ data, onBack, onSubmit }: Props) {
     const {
         register,
         handleSubmit,
         control,
+        watch,
         formState: { errors, isValid },
     } = useForm({
         defaultValues: {
-            owners: data.owners.length > 0 ? data.owners : [{ name: '', ownership: undefined, income: undefined }],
+            owners: data.owners.length > 0 ? data.owners : [],
             wage_growth: data.wage_growth ?? undefined,
         },
         mode: 'onChange',
@@ -39,20 +41,40 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
         name: 'owners',
     })
 
+    const [submitting, setSubmitting] = useState(false)
+
+    const watchOwners = watch('owners')
+    const totalOwnership = watchOwners?.reduce((acc: number, owner: Owner) => {
+        return acc + (Number(owner.ownership) || 0)
+    }, 0)
+
     const handleFinalSubmit = (values: any) => {
-        console.log('🔍 Raw owners submitted:', values.owners)
+        if (submitting) return
+        setSubmitting(true)
 
         const validOwners = values.owners.filter(
             (owner: any) =>
                 owner.name.trim() !== '' &&
                 owner.ownership !== undefined &&
-                owner.income !== undefined
+                owner.income !== undefined &&
+                owner.ownership > 0 &&
+                owner.income > 0
         )
 
-        console.log('✅ Filtered valid owners:', validOwners)
+        const totalOwnership = validOwners.reduce(
+            (acc: number, owner: any) => acc + Number(owner.ownership),
+            0
+        )
 
         if (validOwners.length === 0) {
-            alert('Please enter at least one valid owner with name, % and income.')
+            alert('Please add at least one valid owner.')
+            setSubmitting(false)
+            return
+        }
+
+        if (totalOwnership !== 100) {
+            alert(`Total ownership must be exactly 100%. Currently: ${totalOwnership}%`)
+            setSubmitting(false)
             return
         }
 
@@ -65,17 +87,40 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
             })),
         }
 
-        updateFields(parsedValues)
-        onSubmit()
+        const combined = {
+            ...data,
+            ...parsedValues,
+        }
+
+        console.log("🚀 Submitting to backend:", combined)
+        onSubmit(combined)
     }
 
     return (
         <form onSubmit={handleSubmit(handleFinalSubmit)} className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">👥 Ownership Structure</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">👥 Ownership Structure</h3>
 
+            {/* Ownership summary pill */}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Info size={16} className="text-blue-500" />
+                    Total ownership must equal 100%
+                </div>
+                <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${totalOwnership === 100
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                        }`}
+                >
+                    Ownership: {totalOwnership || 0}%
+                </span>
+            </div>
+
+            {/* Owner blocks */}
             {fields.map((field, index) => (
                 <div key={field.id} className="border p-4 rounded-md space-y-3 bg-gray-50 relative">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Owner Name */}
                         <div>
                             <label className="flex items-center gap-2 font-medium text-gray-700 mb-1">
                                 <User size={16} /> Owner Name
@@ -90,6 +135,7 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
                             )}
                         </div>
 
+                        {/* Ownership % */}
                         <div>
                             <label className="flex items-center gap-2 font-medium text-gray-700 mb-1">
                                 <Percent size={16} /> Ownership %
@@ -108,6 +154,7 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
                             )}
                         </div>
 
+                        {/* Income */}
                         <div>
                             <label className="flex items-center gap-2 font-medium text-gray-700 mb-1">
                                 <DollarSign size={16} /> Income ($)
@@ -143,6 +190,7 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
                 <PlusCircle size={18} /> Add Owner
             </button>
 
+            {/* Wage Growth Input */}
             <div className="pt-6">
                 <label className="flex items-center gap-2 font-medium text-gray-700 mb-1">
                     📈 Wage Growth Rate (%)
@@ -158,6 +206,7 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
                 )}
             </div>
 
+            {/* Navigation Buttons */}
             <div className="flex justify-between pt-8">
                 <button
                     type="button"
@@ -166,12 +215,13 @@ export default function Step5OwnershipIncome({ data, updateFields, onBack, onSub
                 >
                     ← Back
                 </button>
+
                 <button
                     type="submit"
-                    disabled={!isValid}
-                    className={`px-6 py-2 rounded-md text-white font-semibold transition ${isValid
-                            ? 'bg-blue-600 hover:bg-blue-700'
-                            : 'bg-gray-400 cursor-not-allowed'
+                    disabled={!isValid || submitting || totalOwnership !== 100}
+                    className={`px-6 py-2 rounded-md text-white font-semibold transition ${isValid && totalOwnership === 100 && !submitting
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-gray-400 cursor-not-allowed'
                         }`}
                 >
                     Submit →
